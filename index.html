@@ -347,7 +347,6 @@
 </head>
 <body>
 
-<!-- ===== SIDEBAR ===== -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="fecharSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
@@ -408,7 +407,6 @@
   </div>
   <div id="menuList"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Carregando catálogo...</div></div>
 
-  <!-- Painel Admin -->
   <div class="admin-panel" id="adminPanel">
     <h3><i class="fas fa-edit"></i> Gerenciar Catálogo</h3>
     <form class="admin-form" id="adminForm">
@@ -475,7 +473,6 @@
       </div>
     </div>
 
-    <!-- ===== PEDIDOS RECEBIDOS ===== -->
     <div style="margin-top:1.5rem; border-top:2px solid #0284C7; padding-top:1rem;">
       <h4 style="font-size:0.9rem; color:#0284C7; margin-bottom:0.5rem;">
         <i class="fas fa-clipboard-list"></i> Pedidos Recebidos
@@ -524,7 +521,6 @@
   </div>
 </div>
 
-<!-- Modal Login -->
 <div class="modal" id="loginModal">
   <div class="modal-content">
     <h2><i class="fas fa-lock" style="color:#0284C7;"></i> Área do Dono</h2>
@@ -538,7 +534,6 @@
   </div>
 </div>
 
-<!-- Modal do Carrinho -->
 <div class="modal" id="cartModal">
   <div class="modal-content cart-modal">
     <h2><i class="fas fa-shopping-bag" style="color:#0284C7;"></i> Meu Pedido</h2>
@@ -573,7 +568,6 @@
   </div>
 </div>
 
-<!-- Modal do QR Code -->
 <div class="modal" id="qrModal">
   <div class="modal-content qr-modal-content">
     <h2><i class="fas fa-qrcode" style="color:#0284C7;"></i> QR Code do Catálogo</h2>
@@ -588,7 +582,7 @@
 
 <script>
 // ============================================================
-// 1. CONFIGURAÇÃO
+// 1. CONFIGURAÇÃO — as tuas chaves
 // ============================================================
 const IMGBB_API_KEY = '2b78487eadcb4941f2cc44b9b416664c';
 const JSONBIN_MASTER_KEY = '$2a$10$A0QcuRadg8Fj8RcsMZHBp.AyR9AbXCNi5RYMZRJZW8RlJ3dH1jwRK';
@@ -733,11 +727,9 @@ window.limparCarrinho = function() {
 
 window.finalizarPedido = function(event) {
   if (carrinho.length === 0) { alert('Seu carrinho está vazio!'); return; }
-  
   const cliente = document.getElementById('clienteInput').value.trim();
   const telefone = document.getElementById('telefoneInput').value.trim();
   const morada = document.getElementById('moradaInput').value.trim();
-  
   if (!cliente) { alert('Informe o seu nome.'); document.getElementById('clienteInput').focus(); return; }
   if (!telefone) { alert('Informe o seu número de telefone.'); document.getElementById('telefoneInput').focus(); return; }
   if (!morada) { alert('Informe a morada para entrega.'); document.getElementById('moradaInput').focus(); return; }
@@ -1012,12 +1004,11 @@ function renderAll() {
 }
 
 // ============================================================
-// 9. PEDIDOS RECEBIDOS (painel admin)
+// 9. PEDIDOS RECEBIDOS
 // ============================================================
 window.carregarPedidos = async function() {
   const container = document.getElementById('listaPedidos');
   const btn = document.getElementById('btnAtualizarPedidos');
-  
   container.innerHTML = '<p style="text-align:center; padding:1rem; color:#94A3B8; font-size:0.8rem;"><i class="fas fa-spinner fa-spin"></i> A carregar...</p>';
   if (btn) btn.disabled = true;
   
@@ -1047,15 +1038,9 @@ window.carregarPedidos = async function() {
     
     let html = `
       <div style="display:flex; gap:0.4rem; margin-bottom:0.7rem; flex-wrap:wrap;">
-        <span style="background:#FEF3C7; color:#B45309; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.65rem; font-weight:700;">
-          ${novos} Novos
-        </span>
-        <span style="background:#DBEAFE; color:#0284C7; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.65rem; font-weight:700;">
-          ${preparacao} Em prep.
-        </span>
-        <span style="background:#DCFCE7; color:#16A34A; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.65rem; font-weight:700;">
-          ${entregues} Entregues
-        </span>
+        <span style="background:#FEF3C7; color:#B45309; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.65rem; font-weight:700;">${novos} Novos</span>
+        <span style="background:#DBEAFE; color:#0284C7; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.65rem; font-weight:700;">${preparacao} Em prep.</span>
+        <span style="background:#DCFCE7; color:#16A34A; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.65rem; font-weight:700;">${entregues} Entregues</span>
       </div>
     `;
     
@@ -1067,59 +1052,31 @@ window.carregarPedidos = async function() {
       else if (estado === 'Em preparação') { corEstado = '#0284C7'; bgEstado = '#DBEAFE'; }
       
       const timestamp = p['Timestamp'] ? new Date(p['Timestamp']) : null;
-      const dataFormatada = timestamp ? timestamp.toLocaleString('pt-PT', {
-        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-      }) : '—';
+      const dataFormatada = timestamp ? timestamp.toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
       
       const pedidoTexto = (p['Pedido'] || '').toString()
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\n/g, '<br>');
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
       
-      // Cliente escapado para uso no onclick
       const clienteEscapado = (p['Cliente'] || '').toString().replace(/'/g, "\\'").replace(/"/g, '&quot;');
       
       html += `
         <div style="background:#fff; border-radius:14px; padding:0.85rem; margin-bottom:0.7rem; border-left:4px solid ${corEstado}; box-shadow:0 3px 10px rgba(0,0,0,0.05);">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.4rem; gap:0.5rem;">
             <div style="flex:1; min-width:0;">
-              <strong style="font-size:0.85rem; color:#0F172A; display:block;">
-                #${pedidos.length - idx} · ${p['Cliente'] || 'Sem nome'}
-              </strong>
-              <span style="font-size:0.65rem; color:#64748B;">
-                <i class="fas fa-clock"></i> ${dataFormatada}
-              </span>
+              <strong style="font-size:0.85rem; color:#0F172A; display:block;">#${pedidos.length - idx} · ${p['Cliente'] || 'Sem nome'}</strong>
+              <span style="font-size:0.65rem; color:#64748B;"><i class="fas fa-clock"></i> ${dataFormatada}</span>
             </div>
-            <span style="background:${bgEstado}; color:${corEstado}; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.6rem; font-weight:700; white-space:nowrap;">
-              ${estado}
-            </span>
+            <span style="background:${bgEstado}; color:${corEstado}; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.6rem; font-weight:700; white-space:nowrap;">${estado}</span>
           </div>
-          <div style="font-size:0.72rem; color:#475569; margin-bottom:0.4rem;">
-            <i class="fas fa-phone" style="color:#0284C7;"></i> ${p['Telefone'] || '—'}
-          </div>
-          <div style="font-size:0.72rem; color:#475569; margin-bottom:0.5rem;">
-            <i class="fas fa-map-marker-alt" style="color:#0284C7;"></i> ${p['Morada'] || '—'}
-          </div>
-          <div style="background:#F8FAFC; border-radius:10px; padding:0.55rem 0.7rem; font-size:0.72rem; color:#0F172A; line-height:1.5; margin-bottom:0.55rem;">
-            ${pedidoTexto}
-          </div>
+          <div style="font-size:0.72rem; color:#475569; margin-bottom:0.4rem;"><i class="fas fa-phone" style="color:#0284C7;"></i> ${p['Telefone'] || '—'}</div>
+          <div style="font-size:0.72rem; color:#475569; margin-bottom:0.5rem;"><i class="fas fa-map-marker-alt" style="color:#0284C7;"></i> ${p['Morada'] || '—'}</div>
+          <div style="background:#F8FAFC; border-radius:10px; padding:0.55rem 0.7rem; font-size:0.72rem; color:#0F172A; line-height:1.5; margin-bottom:0.55rem;">${pedidoTexto}</div>
           <div style="display:flex; justify-content:space-between; align-items:center; gap:0.4rem; flex-wrap:wrap;">
             <strong style="color:#0284C7; font-size:1rem;">${p['Total'] || '0 Kz'}</strong>
             <div style="display:flex; gap:0.3rem;">
-              <button type="button" onclick="marcarEstado(${p._linha}, 'Em preparação')" 
-                      style="background:#0284C7; color:#fff; border:none; padding:0.3rem 0.7rem; border-radius:20px; font-size:0.65rem; font-weight:600; cursor:pointer;">
-                Em prep.
-              </button>
-              <button type="button" onclick="marcarEstado(${p._linha}, 'Entregue')" 
-                      style="background:#22C55E; color:#fff; border:none; padding:0.3rem 0.7rem; border-radius:20px; font-size:0.65rem; font-weight:600; cursor:pointer;">
-                Entregue
-              </button>
-              <button type="button" onclick="apagarPedido(${p._linha}, '${clienteEscapado}')" 
-                      title="Apagar pedido"
-                      style="background:#FEE2E2; color:#dc3545; border:none; padding:0.3rem 0.55rem; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                <i class="fas fa-trash"></i>
-              </button>
+              <button type="button" onclick="marcarEstado(${p._linha}, 'Em preparação')" style="background:#0284C7; color:#fff; border:none; padding:0.3rem 0.7rem; border-radius:20px; font-size:0.65rem; font-weight:600; cursor:pointer;">Em prep.</button>
+              <button type="button" onclick="marcarEstado(${p._linha}, 'Entregue')" style="background:#22C55E; color:#fff; border:none; padding:0.3rem 0.7rem; border-radius:20px; font-size:0.65rem; font-weight:600; cursor:pointer;">Entregue</button>
+              <button type="button" onclick="apagarPedido(${p._linha}, '${clienteEscapado}')" title="Apagar pedido" style="background:#FEE2E2; color:#dc3545; border:none; padding:0.3rem 0.55rem; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-trash"></i></button>
             </div>
           </div>
         </div>
@@ -1148,12 +1105,7 @@ window.marcarEstado = async function(linha, estado) {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'updateStatus',
-        password: PEDIDOS_PASSWORD,
-        linha: linha,
-        estado: estado
-      })
+      body: JSON.stringify({ action: 'updateStatus', password: PEDIDOS_PASSWORD, linha: linha, estado: estado })
     });
     setTimeout(carregarPedidos, 1000);
   } catch (err) {
@@ -1162,25 +1114,19 @@ window.marcarEstado = async function(linha, estado) {
   }
 };
 
-// APAGAR PEDIDO
+// ============================================================
+// APAGAR PEDIDO ← NOVO
+// ============================================================
 window.apagarPedido = async function(linha, cliente) {
   if (!confirm('Apagar o pedido de "' + (cliente || 'sem nome') + '"?\n\nEsta ação é permanente.')) return;
-  
   try {
     await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'deleteOrder',
-        password: PEDIDOS_PASSWORD,
-        linha: linha
-      })
+      body: JSON.stringify({ action: 'deleteOrder', password: PEDIDOS_PASSWORD, linha: linha })
     });
-    
-    // Recarregar a lista após 1 segundo
     setTimeout(carregarPedidos, 1000);
-    
   } catch (err) {
     alert('Erro ao apagar o pedido. Tenta novamente.');
     console.error(err);
@@ -1230,7 +1176,7 @@ async function refreshData() {
       renderAll();
     }
   } catch (err) {
-    console.warn('Sincronização em segundo plano falhou (usando cache):', err);
+    console.warn('Sincronização falhou:', err);
   }
 }
 
@@ -1311,10 +1257,7 @@ async function handleFormSubmit(e) {
   const categoria = document.getElementById('itemCategoria').value;
   const subcategoria = document.getElementById('itemSubcategoria').value;
   const image = document.getElementById('itemImageUrl').value.trim();
-  if (!name || !desc || !price || !categoria) {
-    alert('Preencha todos os campos obrigatórios.');
-    return;
-  }
+  if (!name || !desc || !price || !categoria) { alert('Preencha todos os campos obrigatórios.'); return; }
   const newItem = { id: gerarId(), name, desc, price, categoria, subcategoria: subcategoria || '', image: image || '', featured: false };
   try {
     if (editingIndex >= 0) {
@@ -1334,8 +1277,7 @@ async function resetToDefault() {
   if (confirm('Restaurar catálogo padrão? Apaga todas as alterações.')) {
     menuItems = getDefaultMenu();
     config = { logo: '', whatsapp: '244923456789', adminPassword: 'admin123' };
-    carrinho = [];
-    salvarCarrinho();
+    carrinho = []; salvarCarrinho();
     await saveAndRefresh();
     if (document.getElementById('cartModal').classList.contains('active')) renderizarCarrinho();
     alert('Catálogo restaurado!');
@@ -1542,11 +1484,7 @@ window.gerarQR = function() {
   const url = window.location.href.split('?')[0];
   const container = document.getElementById('qrcode');
   container.innerHTML = '';
-  new QRCode(container, {
-    text: url, width: 200, height: 200,
-    colorDark: '#0F172A', colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
-  });
+  new QRCode(container, { text: url, width: 200, height: 200, colorDark: '#0F172A', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
 };
 window.fecharQR = function() { document.getElementById('qrModal').classList.remove('active'); };
 window.baixarQR = function() {
