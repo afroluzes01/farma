@@ -588,13 +588,13 @@
 
 <script>
 // ============================================================
-// 1. CONFIGURAÇÃO — ⚠️ SUBSTITUI COM AS TUAS CHAVES
+// 1. CONFIGURAÇÃO
 // ============================================================
 const IMGBB_API_KEY = '2b78487eadcb4941f2cc44b9b416664c';
 const JSONBIN_MASTER_KEY = '$2a$10$A0QcuRadg8Fj8RcsMZHBp.AyR9AbXCNi5RYMZRJZW8RlJ3dH1jwRK';
 const BIN_ID = '6aad57fdffd5d160531671ed';
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsQnPlwzD3xm1k69wiUdhJr75Y7OOhLYBaxKGbUZIbMHo5UGzz5ZG_rqEnHLl7qBh4Uw/exec';
-const PEDIDOS_PASSWORD = 'farma2026'; // ⚠️ A MESMA senha do Apps Script
+const PEDIDOS_PASSWORD = 'farma2026';
 
 // ============================================================
 // 2. CATEGORIAS
@@ -731,9 +731,6 @@ window.limparCarrinho = function() {
   }
 };
 
-// ============================================================
-// FINALIZAR PEDIDO → GOOGLE SHEETS
-// ============================================================
 window.finalizarPedido = function(event) {
   if (carrinho.length === 0) { alert('Seu carrinho está vazio!'); return; }
   
@@ -1080,6 +1077,9 @@ window.carregarPedidos = async function() {
         .replace(/>/g, '&gt;')
         .replace(/\n/g, '<br>');
       
+      // Cliente escapado para uso no onclick
+      const clienteEscapado = (p['Cliente'] || '').toString().replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      
       html += `
         <div style="background:#fff; border-radius:14px; padding:0.85rem; margin-bottom:0.7rem; border-left:4px solid ${corEstado}; box-shadow:0 3px 10px rgba(0,0,0,0.05);">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.4rem; gap:0.5rem;">
@@ -1114,6 +1114,11 @@ window.carregarPedidos = async function() {
               <button type="button" onclick="marcarEstado(${p._linha}, 'Entregue')" 
                       style="background:#22C55E; color:#fff; border:none; padding:0.3rem 0.7rem; border-radius:20px; font-size:0.65rem; font-weight:600; cursor:pointer;">
                 Entregue
+              </button>
+              <button type="button" onclick="apagarPedido(${p._linha}, '${clienteEscapado}')" 
+                      title="Apagar pedido"
+                      style="background:#FEE2E2; color:#dc3545; border:none; padding:0.3rem 0.55rem; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-trash"></i>
               </button>
             </div>
           </div>
@@ -1153,6 +1158,31 @@ window.marcarEstado = async function(linha, estado) {
     setTimeout(carregarPedidos, 1000);
   } catch (err) {
     alert('Erro ao atualizar estado.');
+    console.error(err);
+  }
+};
+
+// APAGAR PEDIDO
+window.apagarPedido = async function(linha, cliente) {
+  if (!confirm('Apagar o pedido de "' + (cliente || 'sem nome') + '"?\n\nEsta ação é permanente.')) return;
+  
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'deleteOrder',
+        password: PEDIDOS_PASSWORD,
+        linha: linha
+      })
+    });
+    
+    // Recarregar a lista após 1 segundo
+    setTimeout(carregarPedidos, 1000);
+    
+  } catch (err) {
+    alert('Erro ao apagar o pedido. Tenta novamente.');
     console.error(err);
   }
 };
@@ -1353,7 +1383,6 @@ window.login = function() {
       document.getElementById('logoPreviewImg').style.display = 'none';
       document.getElementById('logoPlaceholderPreview').style.display = 'block';
     }
-    // Carregar pedidos automaticamente
     setTimeout(carregarPedidos, 500);
   } else {
     document.getElementById('loginError').classList.add('show');
